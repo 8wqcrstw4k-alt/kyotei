@@ -189,6 +189,23 @@ select option{background:#0a1f35}
   </div>
 </div>
 
+<!-- コピペ自動入力 -->
+
+<div class="card">
+  <div class="ch">📋 直前情報コピペ自動入力
+    <span style="font-size:10px;color:var(--go);margin-left:auto">✨ 新機能</span>
+  </div>
+  <div class="cb">
+    <div style="font-size:11px;color:var(--mu);margin-bottom:10px;line-height:1.8">
+      <strong style="color:var(--go)">【方法①】</strong> このClaude.aiに画像3枚を送ると読み取り結果＋貼り付け用テキストを出力します。そのテキストをここにペースト。<br>
+      <strong style="color:var(--ac)">【方法②】</strong> boatrace.jpの直前情報ページを全選択コピーしてここにペースト。
+    </div>
+    <textarea id="paste-area" placeholder="boatrace.jpのページをコピーしてここに長押し→ペースト" style="width:100%;height:120px;background:rgba(0,0,0,.35);border:1px solid var(--b);color:var(--tx);padding:12px;border-radius:10px;font-size:13px;outline:none;resize:none;font-family:-apple-system,sans-serif;line-height:1.6"></textarea>
+    <button onclick="parsePaste()" style="width:100%;padding:14px;background:linear-gradient(135deg,#1a5c2a,var(--gr));border:none;border-radius:12px;color:#000;font-size:15px;font-weight:800;letter-spacing:1px;cursor:pointer;margin-top:8px;box-shadow:0 4px 20px rgba(0,230,118,.2)">⚡ 自動解析して入力する</button>
+    <div id="parse-result" style="margin-top:10px;font-size:12px;display:none"></div>
+  </div>
+</div>
+
 <!-- 選手データ -->
 
 <div class="card">
@@ -277,6 +294,208 @@ const SD={
   唐津:{w:'海水',t:true,ia:.53,wf:'very_strong',tags:['玄界灘','荒れやすい'],cc:'玄界灘で風波の影響大。外枠浮上ケースも多い難コース。'},
   大村:{w:'海水',t:false,ia:.78,wf:'low',tags:['競艇発祥地','最強イン'],cc:'競艇発祥の地。大村湾で最安定。1コース勝率全国トップ。'}
 };
+
+// ============ コピペ自動解析 ============
+// 対応フォーマット:
+// 【専用フォーマット】Claude読み取り結果をそのまま貼る形式
+//   枠番(1行) → 選手名 → 級別 → 展示T → ST → チルト →
+//   モーター2連率 → モーター3連率 → ボート2連率 → ボート3連率 →
+//   全国勝率 → 全国2連率 → 全国3連率 → 当地勝率 → 当地2連率 → 当地3連率
+// 【boatrace.jpコピペ】ページテキストをそのまま貼る形式
+
+function parsePaste(){
+  const txt=document.getElementById('paste-area').value;
+  if(!txt.trim()){alert('テキストをペーストしてください');return;}
+
+  const lines=txt.split('\n').map(l=>l.trim()).filter(l=>l);
+  const boats=[{},{},{},{},{},{}];
+
+  // ---- 専用フォーマット検出 ----
+  // 枠番1〜6が単独行で順番に出てくるかチェック
+  const isStructured = checkStructuredFormat(lines);
+
+  if(isStructured){
+    parseStructuredFormat(lines, boats);
+  } else {
+    parseBoatraceFormat(lines, boats);
+  }
+
+  // ---- フォームに反映 ----
+  let count=0;
+  boats.forEach((b,i)=>{
+    const idx=i+1;
+    if(b.name){setVal('n'+idx,b.name);count++;}
+    if(b.rank)setSelect('k'+idx,b.rank);
+    if(b.time)setVal('t'+idx,b.time.toFixed(2));
+    if(b.st!==undefined)setVal('st'+idx,b.st.toFixed(2));
+    if(b.tilt!==undefined)setSelect('tilt'+idx,b.tilt);
+    if(b.motorRate)setVal('mr'+idx,b.motorRate.toFixed(1));
+    if(b.boatRate)setVal('br'+idx,b.boatRate.toFixed(1));
+    if(b.winRate)setVal('wr'+idx,b.winRate.toFixed(2));
+    if(b.localRate)setVal('lr'+idx,b.localRate.toFixed(2));
+    if(b.fl)setSelect('f'+idx,b.fl>0?b.fl:-1);
+    if(b.recent&&b.recent.length>0){
+      b.recent.slice(0,3).forEach((p,j)=>setVal(`r${j+1}_${idx}`,p));
+    }
+    updateSummary(idx);
+    if(b.name||b.time){
+      document.getElementById('bcb'+idx).classList.add('open');
+      document.getElementById('arr'+idx).classList.add('open');
+    }
+  });
+
+  const res=document.getElementById('parse-result');
+  res.style.display='block';
+  if(count>0){
+    res.innerHTML=`<div style="background:rgba(0,230,118,.1);border:1px solid rgba(0,230,118,.3);border-radius:8px;padding:10px;color:var(--gr)">✅ ${count}艇分のデータを自動入力しました！内容を確認して予想を実行してください。</div>`;
+  } else {
+    res.innerHTML=`<div style="background:rgba(255,68,68,.1);border:1px solid rgba(255,68,68,.3);border-radius:8px;padding:10px;color:var(--rd)">⚠️ データを読み取れませんでした。Claude読み取り結果またはboatrace.jpの直前情報テキストをコピーしてください。</div>`;
+  }
+}
+
+// 専用フォーマットかどうか判定
+function checkStructuredFormat(lines){
+  let wakuCount=0;
+  for(const l of lines){
+    if(/^[1-6]$/.test(l)) wakuCount++;
+  }
+  return wakuCount>=3; // 3艇以上の枠番単独行があれば専用フォーマット
+}
+
+// 【専用フォーマット】パーサー
+// 枠番 → 選手名 → 級別 → 展示T → ST → チルト →
+// M2連率 → M3連率 → B2連率 → B3連率 →
+// 全国勝率 → 全国2連率 → 全国3連率 → 当地勝率 → 当地2連率 → 当地3連率
+function parseStructuredFormat(lines, boats){
+  const FIELD_ORDER=['name','rank','time','st','tilt','motorRate','motor3','boatRate','boat3','winRate','win2','win3','localRate','local2','local3'];
+  let currentBoat=-1;
+  let fieldIdx=0;
+
+  for(const l of lines){
+    // 枠番検出
+    if(/^[1-6]$/.test(l)){
+      currentBoat=parseInt(l)-1;
+      fieldIdx=0;
+      continue;
+    }
+    if(currentBoat<0)continue;
+    const b=boats[currentBoat];
+    const field=FIELD_ORDER[fieldIdx];
+    if(!field)continue;
+
+    switch(field){
+      case 'name':
+        // 選手名（漢字スペース漢字 or 漢字のみ）
+        if(/^[\u4e00-\u9fff\u3040-\u30ff\s]{2,8}$/.test(l)){
+          b.name=l.replace(/\s+/g,'');fieldIdx++;
+        }
+        break;
+      case 'rank':
+        if(/^(A1|A2|B1|B2)$/.test(l)){b.rank=l;fieldIdx++;}
+        break;
+      case 'time':
+        if(/^[67]\.\d{2}$/.test(l)){b.time=parseFloat(l);fieldIdx++;}
+        break;
+      case 'st':
+        if(/^0?\.\d{2}$/.test(l)){b.st=parseFloat('0'+l.replace(/^0/,''));fieldIdx++;}
+        break;
+      case 'tilt':
+        if(/^-?[0-9.]+$/.test(l)){
+          const t=parseFloat(l);
+          // チルトの有効値にスナップ
+          const validTilts=[-0.5,0,0.5,1,1.5,3];
+          b.tilt=validTilts.reduce((a,v)=>Math.abs(v-t)<Math.abs(a-t)?v:a,0);
+          fieldIdx++;
+        }
+        break;
+      case 'motorRate':
+        if(/^\d{1,2}\.\d{1,2}$/.test(l)){b.motorRate=parseFloat(l);fieldIdx++;}
+        break;
+      case 'motor3':
+        if(/^\d{1,2}\.\d{1,2}$/.test(l)){fieldIdx++;} // 3連率は現状スキップ
+        break;
+      case 'boatRate':
+        if(/^\d{1,2}\.\d{1,2}$/.test(l)){b.boatRate=parseFloat(l);fieldIdx++;}
+        break;
+      case 'boat3':
+        if(/^\d{1,2}\.\d{1,2}$/.test(l)){fieldIdx++;}
+        break;
+      case 'winRate':
+        if(/^\d\.\d{2}$/.test(l)){b.winRate=parseFloat(l);fieldIdx++;}
+        break;
+      case 'win2':
+        if(/^\d{1,2}\.\d{2}$/.test(l)){fieldIdx++;}
+        break;
+      case 'win3':
+        if(/^\d{1,2}\.\d{2}$/.test(l)){fieldIdx++;}
+        break;
+      case 'localRate':
+        if(/^\d\.\d{2}$/.test(l)){b.localRate=parseFloat(l);fieldIdx++;}
+        break;
+      case 'local2':
+        if(/^\d{1,2}\.\d{2}$/.test(l)){fieldIdx++;}
+        break;
+      case 'local3':
+        if(/^\d{1,2}\.\d{2}$/.test(l)){fieldIdx++;}
+        break;
+    }
+  }
+}
+
+// 【boatrace.jpコピペ】パーサー
+function parseBoatraceFormat(lines, boats){
+  const nameRe=/^[\u4e00-\u9fff]{2,5}$/;
+  const rankRe=/\b(A1|A2|B1|B2)\b/;
+  const timeRe=/\b([67]\.\d{2})\b/;
+  const flRe=/F(\d)|L(\d)/i;
+  let currentBoat=-1;
+  let recentBuf=[];
+
+  for(let i=0;i<lines.length;i++){
+    const l=lines[i];
+    // 枠番
+    const wm=l.match(/^([1-6])\s*(号艇)?$/)
+    if(wm){
+      if(currentBoat>=0&&recentBuf.length>0){boats[currentBoat].recent=recentBuf.slice(0,3);recentBuf=[];}
+      currentBoat=parseInt(wm[1])-1;continue;
+    }
+    if(currentBoat<0)continue;
+    const b=boats[currentBoat];
+
+    if(!b.name&&nameRe.test(l)){b.name=l;continue;}
+    const rkm=l.match(rankRe);if(rkm&&!b.rank){b.rank=rkm[1];continue;}
+    const flm=l.match(flRe);if(flm){b.fl=flm[1]?parseInt(flm[1]):-parseInt(flm[2]||1);continue;}
+    const tmm=l.match(timeRe);if(tmm&&!b.time){b.time=parseFloat(tmm[1]);continue;}
+    if(/^0?\.\d{2}$/.test(l)&&!b.st){b.st=parseFloat('0'+l.replace(/^0/,''));continue;}
+    if(/^-?[0-9]\.[05]$/.test(l)&&b.st!==undefined&&b.tilt===undefined){
+      const t=parseFloat(l);
+      const validTilts=[-0.5,0,0.5,1,1.5,3];
+      b.tilt=validTilts.reduce((a,v)=>Math.abs(v-t)<Math.abs(a-t)?v:a,0);
+      continue;
+    }
+    if(/^\d{1,2}\.\d{2}$/.test(l)){
+      const v=parseFloat(l);
+      if(v>=10&&v<=100){if(!b.motorRate)b.motorRate=v;else if(!b.boatRate)b.boatRate=v;}
+      else if(v>=1&&v<10){if(!b.winRate)b.winRate=v;else if(!b.localRate)b.localRate=v;}
+      continue;
+    }
+    if(/^[1-6]$/.test(l)){recentBuf.push(parseInt(l));continue;}
+  }
+  if(currentBoat>=0&&recentBuf.length>0)boats[currentBoat].recent=recentBuf.slice(0,3);
+
+  // フォールバック: 枠番なしの場合は順番割り当て
+  if(!boats.some(b=>b.name)){
+    const names=lines.filter(l=>nameRe.test(l)).slice(0,6);
+    const ranks=lines.map(l=>{const m=l.match(rankRe);return m?m[1]:null}).filter(Boolean).slice(0,6);
+    const times=[];lines.forEach(l=>{const m=l.match(timeRe);if(m)times.push(parseFloat(m[1]));});
+    names.forEach((n,i)=>{boats[i].name=n;});
+    ranks.forEach((r,i)=>{boats[i].rank=r;});
+    times.slice(0,6).forEach((t,i)=>{boats[i].time=t;});
+  }
+}
+
+function setVal(id,v){const el=document.getElementById(id);if(el)el.value=v;}
+function setSelect(id,v){const el=document.getElementById(id);if(el)el.value=v;}
 
 // ============ 選手カード生成 ============
 const LC=['l1','l2','l3','l4','l5','l6'];
