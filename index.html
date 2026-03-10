@@ -189,19 +189,51 @@ select option{background:#0a1f35}
   </div>
 </div>
 
+<!-- 展示進入隊形 -->
+
+<div class="card">
+  <div class="ch">🚤 展示進入隊形
+    <span style="font-size:10px;color:var(--mu);margin-left:auto">実際の進入順を設定</span>
+  </div>
+  <div class="cb">
+    <div style="font-size:11px;color:var(--mu);margin-bottom:10px;line-height:1.7">
+      進入固定戦以外は展示で実際の隊形を確認して設定してください。デフォルトは枠番通り。
+    </div>
+    <div style="font-size:11px;color:var(--go);font-weight:700;margin-bottom:8px">各コースに入る艇番を設定</div>
+    <div class="irow3" style="margin-bottom:10px">
+      <div><label>1コース</label>
+        <select class="rs" id="fc1"><option value="1">1号艇</option><option value="2">2号艇</option><option value="3">3号艇</option><option value="4">4号艇</option><option value="5">5号艇</option><option value="6">6号艇</option></select></div>
+      <div><label>2コース</label>
+        <select class="rs" id="fc2"><option value="1">1号艇</option><option value="2" selected>2号艇</option><option value="3">3号艇</option><option value="4">4号艇</option><option value="5">5号艇</option><option value="6">6号艇</option></select></div>
+      <div><label>3コース</label>
+        <select class="rs" id="fc3"><option value="1">1号艇</option><option value="2">2号艇</option><option value="3" selected>3号艇</option><option value="4">4号艇</option><option value="5">5号艇</option><option value="6">6号艇</option></select></div>
+    </div>
+    <div class="irow3">
+      <div><label>4コース</label>
+        <select class="rs" id="fc4"><option value="1">1号艇</option><option value="2">2号艇</option><option value="3">3号艇</option><option value="4" selected>4号艇</option><option value="5">5号艇</option><option value="6">6号艇</option></select></div>
+      <div><label>5コース</label>
+        <select class="rs" id="fc5"><option value="1">1号艇</option><option value="2">2号艇</option><option value="3">3号艇</option><option value="4">4号艇</option><option value="5" selected>5号艇</option><option value="6">6号艇</option></select></div>
+      <div><label>6コース</label>
+        <select class="rs" id="fc6"><option value="1">1号艇</option><option value="2">2号艇</option><option value="3">3号艇</option><option value="4">4号艇</option><option value="5">5号艇</option><option value="6" selected>6号艇</option></select></div>
+    </div>
+    <div id="formation-preview" style="margin-top:8px;padding:10px;background:rgba(0,0,0,.3);border-radius:8px;font-size:12px;color:var(--ac);text-align:center">
+      隊形：1-2-3-4-5-6（枠番通り）
+    </div>
+    <button onclick="resetFormation()" style="margin-top:8px;width:100%;padding:10px;background:rgba(90,138,176,.2);border:1px solid var(--b);border-radius:8px;color:var(--mu);font-size:12px;cursor:pointer">🔄 枠番通りにリセット</button>
+  </div>
+</div>
+
 <!-- コピペ自動入力 -->
 
 <div class="card">
-  <div class="ch">📋 直前情報コピペ自動入力
-    <span style="font-size:10px;color:var(--go);margin-left:auto">✨ 新機能</span>
-  </div>
+  <div class="ch">📋 直前情報コピペ自動入力</div>
   <div class="cb">
     <div style="font-size:11px;color:var(--mu);margin-bottom:10px;line-height:1.8">
-      <strong style="color:var(--go)">【方法①】</strong> このClaude.aiに画像3枚を送ると読み取り結果＋貼り付け用テキストを出力します。そのテキストをここにペースト。<br>
+      <strong style="color:var(--go)">【方法①】</strong> このClaude.aiに画像を送ると読み取り結果＋貼り付け用テキストを出力します。そのテキストをここにペースト。<br>
       <strong style="color:var(--ac)">【方法②】</strong> boatrace.jpの直前情報ページを全選択コピーしてここにペースト。
     </div>
     <textarea id="paste-area" placeholder="boatrace.jpのページをコピーしてここに長押し→ペースト" style="width:100%;height:120px;background:rgba(0,0,0,.35);border:1px solid var(--b);color:var(--tx);padding:12px;border-radius:10px;font-size:13px;outline:none;resize:none;font-family:-apple-system,sans-serif;line-height:1.6"></textarea>
-    <button onclick="parsePaste()" style="width:100%;padding:14px;background:linear-gradient(135deg,#1a5c2a,var(--gr));border:none;border-radius:12px;color:#000;font-size:15px;font-weight:800;letter-spacing:1px;cursor:pointer;margin-top:8px;box-shadow:0 4px 20px rgba(0,230,118,.2)">⚡ 自動解析して入力する</button>
+    <button onclick="parsePaste()" style="width:100%;padding:14px;background:linear-gradient(135deg,#1a5c2a,var(--gr));border:none;border-radius:12px;color:#000;font-size:15px;font-weight:800;letter-spacing:1px;cursor:pointer;margin-top:8px">⚡ 自動解析して入力する</button>
     <div id="parse-result" style="margin-top:10px;font-size:12px;display:none"></div>
   </div>
 </div>
@@ -244,7 +276,7 @@ select option{background:#0a1f35}
         <div class="wi2"><div class="wi2-dot" style="background:#5ad4ff"></div><div><div class="wi2-txt">全国(勝率+2連+3連)</div><div class="wi2-val">10%</div></div></div>
         <div class="wi2"><div class="wi2-dot" style="background:var(--pu)"></div><div><div class="wi2-txt">平均ST</div><div class="wi2-val">10%</div></div></div>
         <div class="wi2"><div class="wi2-dot" style="background:#ff9060"></div><div><div class="wi2-txt">直近3走成績</div><div class="wi2-val">10%</div></div></div>
-        <div class="wi2"><div class="wi2-dot" style="background:var(--rd)"></div><div><div class="wi2-txt">気象・チルト他</div><div class="wi2-val">7%</div></div></div>
+        <div class="wi2"><div class="wi2-dot" style="background:#50fa7b"></div><div><div class="wi2-txt">コース別成績・ST・進入率</div><div class="wi2-val">+補正</div></div></div>
       </div>
     </div>
   </div>
@@ -296,6 +328,25 @@ const SD={
   大村:{w:'海水',t:false,ia:.78,wf:'low',tags:['競艇発祥地','最強イン'],cc:'競艇発祥の地。大村湾で最安定。1コース勝率全国トップ。'}
 };
 
+// ============ 進入隊形 ============
+function updateFormationPreview(){
+  const el=document.getElementById('formation-preview');
+  if(!el)return;
+  const f=[1,2,3,4,5,6].map(c=>{const s=document.getElementById('fc'+c);return s?s.value:c;});
+  el.textContent='隊形：'+f.join('-');
+}
+function resetFormation(){
+  [1,2,3,4,5,6].forEach(c=>{const s=document.getElementById('fc'+c);if(s)s.value=c;});
+  updateFormationPreview();
+}
+function getActualCourse(lane){
+  for(let c=1;c<=6;c++){
+    const el=document.getElementById('fc'+c);
+    if(el&&parseInt(el.value)===lane)return c;
+  }
+  return lane;
+}
+
 // ============ コピペ自動解析 ============
 // 対応フォーマット:
 // 【専用フォーマット】Claude読み取り結果をそのまま貼る形式
@@ -325,6 +376,9 @@ function parsePaste(){
   let count=0;
   boats.forEach((b,i)=>{
     const idx=i+1;
+    if(b.courseRate)b.courseRate.forEach((v,j)=>{if(v)setVal(`c${j+1}r${idx}`,v.toFixed(1));});
+    if(b.courseST)b.courseST.forEach((v,j)=>{if(v)setVal(`cs${j+1}${idx}`,v.toFixed(2));});
+    if(b.courseIn)b.courseIn.forEach((v,j)=>{if(v)setVal(`ci${j+1}${idx}`,v.toFixed(1));});
     if(b.name){setVal('n'+idx,b.name);count++;}
     if(b.rank)setSelect('k'+idx,b.rank);
     if(b.odds)setVal('odds'+idx,b.odds);
@@ -597,6 +651,60 @@ function initBoats(){
             <input type="number" class="rz-input" id="r3_${i}" placeholder="3" min="1" max="6">
           </div>
         </div>
+
+        <div class="section-lbl" style="cursor:pointer" onclick="toggleCourseStats(${i})">
+          🏟️ コース別成績（選手詳細）
+          <span id="cs-toggle${i}" style="font-size:10px;color:var(--ac);margin-left:auto">▶ 展開する</span>
+        </div>
+        <div id="cs-body${i}" style="display:none">
+          <div style="font-size:10px;color:var(--mu);margin-bottom:8px;line-height:1.7">
+            選手詳細ページ（boatrace.jp）のコース別成績・STをClaude.aiで読み取って入力してください
+          </div>
+          <div style="font-size:11px;color:var(--go);font-weight:700;margin-bottom:5px">進入コース別 3連率(%)</div>
+          <div class="irow3" style="margin-bottom:6px">
+            <div><label>1コース3連率</label><input type="number" class="is" id="c1r${i}" value="" step="0.1" min="0" max="100" placeholder="-"></div>
+            <div><label>2コース3連率</label><input type="number" class="is" id="c2r${i}" value="" step="0.1" min="0" max="100" placeholder="-"></div>
+            <div><label>3コース3連率</label><input type="number" class="is" id="c3r${i}" value="" step="0.1" min="0" max="100" placeholder="-"></div>
+          </div>
+          <div class="irow3" style="margin-bottom:6px">
+            <div><label>4コース3連率</label><input type="number" class="is" id="c4r${i}" value="" step="0.1" min="0" max="100" placeholder="-"></div>
+            <div><label>5コース3連率</label><input type="number" class="is" id="c5r${i}" value="" step="0.1" min="0" max="100" placeholder="-"></div>
+            <div><label>6コース3連率</label><input type="number" class="is" id="c6r${i}" value="" step="0.1" min="0" max="100" placeholder="-"></div>
+          </div>
+          <div style="font-size:11px;color:var(--go);font-weight:700;margin-bottom:5px">コース別 平均ST</div>
+          <div class="irow3" style="margin-bottom:6px">
+            <div><label>1コースST</label><input type="number" class="is" id="cs1${i}" value="" step="0.01" min="0" max="1" placeholder="-"></div>
+            <div><label>2コースST</label><input type="number" class="is" id="cs2${i}" value="" step="0.01" min="0" max="1" placeholder="-"></div>
+            <div><label>3コースST</label><input type="number" class="is" id="cs3${i}" value="" step="0.01" min="0" max="1" placeholder="-"></div>
+          </div>
+          <div class="irow3" style="margin-bottom:6px">
+            <div><label>4コースST</label><input type="number" class="is" id="cs4${i}" value="" step="0.01" min="0" max="1" placeholder="-"></div>
+            <div><label>5コースST</label><input type="number" class="is" id="cs5${i}" value="" step="0.01" min="0" max="1" placeholder="-"></div>
+            <div><label>6コースST</label><input type="number" class="is" id="cs6${i}" value="" step="0.01" min="0" max="1" placeholder="-"></div>
+          </div>
+          <div style="font-size:11px;color:var(--go);font-weight:700;margin-bottom:5px">コース別 進入率(%)</div>
+          <div class="irow3" style="margin-bottom:6px">
+            <div><label>1コース進入率</label><input type="number" class="is" id="ci1${i}" value="" step="0.1" min="0" max="100" placeholder="-"></div>
+            <div><label>2コース進入率</label><input type="number" class="is" id="ci2${i}" value="" step="0.1" min="0" max="100" placeholder="-"></div>
+            <div><label>3コース進入率</label><input type="number" class="is" id="ci3${i}" value="" step="0.1" min="0" max="100" placeholder="-"></div>
+          </div>
+          <div class="irow3" style="margin-bottom:6px">
+            <div><label>4コース進入率</label><input type="number" class="is" id="ci4${i}" value="" step="0.1" min="0" max="100" placeholder="-"></div>
+            <div><label>5コース進入率</label><input type="number" class="is" id="ci5${i}" value="" step="0.1" min="0" max="100" placeholder="-"></div>
+            <div><label>6コース進入率</label><input type="number" class="is" id="ci6${i}" value="" step="0.1" min="0" max="100" placeholder="-"></div>
+          </div>
+          <div style="font-size:11px;color:var(--go);font-weight:700;margin-bottom:5px">🏁 コース別スタート順（平均）</div>
+          <div class="irow3" style="margin-bottom:6px">
+            <div><label>1コース順</label><input type="number" class="is" id="so1${i}" value="" step="0.1" min="1" max="6" placeholder="-"></div>
+            <div><label>2コース順</label><input type="number" class="is" id="so2${i}" value="" step="0.1" min="1" max="6" placeholder="-"></div>
+            <div><label>3コース順</label><input type="number" class="is" id="so3${i}" value="" step="0.1" min="1" max="6" placeholder="-"></div>
+          </div>
+          <div class="irow3" style="margin-bottom:6px">
+            <div><label>4コース順</label><input type="number" class="is" id="so4${i}" value="" step="0.1" min="1" max="6" placeholder="-"></div>
+            <div><label>5コース順</label><input type="number" class="is" id="so5${i}" value="" step="0.1" min="1" max="6" placeholder="-"></div>
+            <div><label>6コース順</label><input type="number" class="is" id="so6${i}" value="" step="0.1" min="1" max="6" placeholder="-"></div>
+          </div>
+        </div>
       </div>`;
     wrap.appendChild(div);
   }
@@ -606,7 +714,15 @@ function initBoats(){
   document.getElementById('k3').value='A2';
 }
 
-function toggleBoat(i){
+function toggleCourseStats(i){
+  const body=document.getElementById('cs-body'+i);
+  const toggle=document.getElementById('cs-toggle'+i);
+  const isOpen=body.style.display!=='none';
+  body.style.display=isOpen?'none':'block';
+  toggle.textContent=isOpen?'▶ 展開する':'▼ 閉じる';
+}
+
+
   const body=document.getElementById('bcb'+i);
   const arr=document.getElementById('arr'+i);
   const isOpen=body.classList.contains('open');
@@ -637,6 +753,9 @@ function predict(){
   if(!sn){alert('競艇場を選択してください');return;}
   document.getElementById('results').style.display='none';
   document.getElementById('ld').className='loading on';
+  // 前回の展開カードを削除
+  const old=document.getElementById('tac-card');
+  if(old)old.remove();
   setTimeout(()=>{
     document.getElementById('ld').className='loading';
     document.getElementById('results').style.display='block';
@@ -645,8 +764,8 @@ function predict(){
   },1800);
 }
 
-function getNum(id,def){return parseFloat(document.getElementById(id).value)||def;}
-function getInt(id,def){return parseInt(document.getElementById(id).value)||def;}
+function getNum(id,def){const el=document.getElementById(id);return el?parseFloat(el.value)||def:def;}
+function getInt(id,def){const el=document.getElementById(id);return el?parseInt(el.value)||def:def;}
 
 function calc(sn){
   const s=SD[sn];
@@ -680,6 +799,14 @@ function calc(sn){
       local2:getNum('lr2'+i,40),
       local3:getNum('lr3'+i,60),
       odds:getNum('odds'+i,0),
+      // コース別スタート順
+      startOrder:[1,2,3,4,5,6].map(c=>getNum(`so${c}${i}`,0)),
+      // コース別3連率（1〜6コース）
+      courseRate:[1,2,3,4,5,6].map(c=>getNum(`c${c}r${i}`,0)),
+      // コース別平均ST
+      courseST:[1,2,3,4,5,6].map(c=>getNum(`cs${c}${i}`,0)),
+      // コース別進入率
+      courseIn:[1,2,3,4,5,6].map(c=>getNum(`ci${c}${i}`,0)),
       recent:[r1,r2,r3].filter(x=>x>0)
     });
   }
@@ -765,7 +892,35 @@ function calc(sn){
     if((sn==='江戸川'||sn==='津')&&b.lane>=4)venueBonus=5;
     if(gr==='SG'&&b.rank==='A1')venueBonus+=6;
 
-    // ⑭ オッズ補正（AIと市場の乖離を活用）
+    // ⑭ コース別成績補正（実際の進入コースを使用）
+    let courseBonus=0;
+    const actualCourse=getActualCourse(b.lane); // 進入隊形から実コース取得
+    const cRate=b.courseRate[actualCourse-1];
+    const cST=b.courseST[actualCourse-1];
+    const cIn=b.courseIn[actualCourse-1];
+    const cSO=b.startOrder[actualCourse-1]; // スタート順（小さいほど早い）
+    if(cRate>0){
+      const avgRate=b.courseRate.filter(x=>x>0);
+      if(avgRate.length>0){
+        const avg=avgRate.reduce((a,v)=>a+v,0)/avgRate.length;
+        courseBonus+=(cRate-avg)/avg*5;
+      }
+    }
+    if(cST>0&&cST<0.25){
+      courseBonus+=Math.max(-3,Math.min(3,(0.18-cST)*20));
+    }
+    if(cIn>0){
+      if(cIn>=80)courseBonus+=2;
+      else if(cIn>=50)courseBonus+=1;
+      else if(cIn<20)courseBonus-=2;
+    }
+    // スタート順ボーナス（1番早い=1.0が最高、遅いほど不利）
+    if(cSO>0){
+      // スタート順1.0〜2.0は加点、4.0以上は減点
+      courseBonus+=Math.max(-3,Math.min(3,(3.5-cSO)*1.5));
+    }
+
+    // ⑮ オッズ補正
     let oddsBonus=0;
     if(b.odds>0){
       // 全艇の平均オッズを基準に相対評価
@@ -782,7 +937,7 @@ function calc(sn){
       }
     }
 
-    const total=tScore+mScore+cScore+stScore+recentScore+wScore+lScore+tiltBonus+rankScore+windBonus+waveBonus+flPenalty+venueBonus+oddsBonus;
+    const total=tScore+mScore+cScore+stScore+recentScore+wScore+lScore+tiltBonus+rankScore+windBonus+waveBonus+flPenalty+venueBonus+courseBonus+oddsBonus;
 
     return{...b,
       sc:Math.max(0,total),
@@ -801,10 +956,104 @@ function calc(sn){
   if(ranked[0].pct-ranked[1].pct<8)conf-=8;
   conf=Math.max(38,Math.min(95,conf));
 
-  render(sn,s,ranked,conf,wd,ws,wv,wx,gr);
+  render(sn,s,ranked,conf,wd,ws,wv,wx,gr,boats);
 }
 
-function render(sn,s,r,conf,wd,ws,wv,wx,gr){
+// ============ 展開分析エンジン ============
+function analyzeTactics(boats, s, sn, wd, ws, wv){
+  const b=lane=>boats.find(x=>x.lane===lane);
+
+  // 各艇の実効ST（コース別STがあればそちらを優先）
+  const effectiveST=b2=>{
+    const cst=b2.courseST[b2.lane-1];
+    return (cst>0)?cst:b2.st;
+  };
+  const stRanked=[...boats].sort((a,bv)=>effectiveST(a)-effectiveST(bv));
+  const fastST=stRanked[0];
+
+  // 展示タイム最速艇
+  const fastTime=[...boats].sort((a,bv)=>a.time-bv.time)[0];
+
+  // イン艇（1コース）
+  const ins=b(1);
+
+  // ---- 逃げ確率 ----
+  // インのST・モーター・コース係数から算出
+  let nigeProb = s.ia * 100; // 基準はコース特性
+  if(ins){
+    if(ins.st<=0.13) nigeProb+=8;
+    if(ins.st>=0.19) nigeProb-=8;
+    if(ins.motorRate>=40) nigeProb+=5;
+    if(ins.motorRate<25) nigeProb-=8;
+    if(ins.tilt>0) nigeProb-=3;
+    if(ins.fl!==0) nigeProb-=15;
+  }
+  if(wd==='向かい風'&&ws>5) nigeProb+=6;
+  if(wv>20) nigeProb-=10;
+  nigeProb=Math.max(15,Math.min(88,Math.round(nigeProb)));
+
+  // ---- まくり候補 ----
+  // 3〜5コースで展示タイムが速く、チルト高め、STが速い艇
+  const makuriCandidates=boats.filter(b2=>{
+    if(b2.lane<3||b2.lane>5)return false;
+    const faster=boats.filter(x=>x.lane<b2.lane&&x.time<=b2.time+0.05).length;
+    return faster===0||(b2.tilt>=0.5)||(b2.time<=fastTime.time+0.02);
+  }).sort((a,bv)=>a.time-bv.time);
+
+  // ---- 差し候補 ----
+  // 2〜4コースでSTが速い艇
+  const sashiCandidates=boats.filter(b2=>{
+    if(b2.lane<2||b2.lane>4)return false;
+    return b2.st<=0.15;
+  }).sort((a,bv)=>a.st-bv.st);
+
+  // ---- まくり差し候補 ----
+  // 3〜4コースでSTが遅くない＋展示速い
+  const makuriSashiCandidates=boats.filter(b2=>{
+    if(b2.lane<3||b2.lane>4)return false;
+    return b2.time<=fastTime.time+0.05;
+  });
+
+  // ---- 警戒艇 ----
+  const warnings=[];
+  boats.forEach(b2=>{
+    const alerts=[];
+    // チルト高め外枠
+    if(b2.tilt>=1.5&&b2.lane>=4) alerts.push(`チルト+${b2.tilt}の直線番長、まくり一発警戒`);
+    // STが全艇最速
+    if(b2.lane===fastST.lane&&b2.lane!==1) alerts.push(`ST${b2.st}秒で全艇最速、スタートで主導権を握る可能性`);
+    // 展示最速かつ外枠
+    if(b2.lane===fastTime.lane&&b2.lane>=3) alerts.push(`展示タイム${b2.time.toFixed(2)}で全艇最速、機力で押し切るか`);
+    // モーター高水準外枠
+    if(b2.motorRate>=45&&b2.lane>=3) alerts.push(`モーター${b2.motorRate}%の高水準機、展開次第で台頭`);
+    // 当地勝率高い
+    if(b2.localRate>=7&&b2.lane>=2) alerts.push(`当地勝率${b2.localRate}と地元巧者、コース熟知`);
+    if(alerts.length>0) warnings.push({boat:b2, alerts});
+  });
+
+  // ---- 展開パターン確率 ----
+  const makuriProb=makuriCandidates.length>0?Math.round((100-nigeProb)*0.45):5;
+  const sashiProb=sashiCandidates.length>0?Math.round((100-nigeProb)*0.35):5;
+  const otherProb=Math.max(0,100-nigeProb-makuriProb-sashiProb);
+
+  // ---- 戦術別買い目 ----
+  const inLane=1;
+  const mk=makuriCandidates[0]?.lane;
+  const sa=sashiCandidates[0]?.lane;
+  const ms=makuriSashiCandidates[0]?.lane;
+
+  const tactics={
+    nigeProb, makuriProb, sashiProb, otherProb,
+    makuriMain: mk, sashiMain: sa, makuriSashiMain: ms,
+    warnings,
+    fastTime, fastST,
+    makuriCandidates: makuriCandidates.slice(0,2),
+    sashiCandidates: sashiCandidates.slice(0,2)
+  };
+  return tactics;
+}
+
+function render(sn,s,r,conf,wd,ws,wv,wx,gr,boats){
   document.getElementById('st-title').textContent=sn+'競艇';
   const tags=s.tags.map(t=>`<span class="tag tf">${t}</span>`).join('');
   document.getElementById('st-body').innerHTML=`
@@ -851,11 +1100,98 @@ function render(sn,s,r,conf,wd,ws,wv,wx,gr){
   },100);
 
   const[l1,l2,l3]=[r[0].lane,r[1].lane,r[2].lane];
-  document.getElementById('combos').innerHTML=[
-    ['単勝',l1,'本命'],['2連単',`${l1}-${l2}`,'推奨'],['3連単①',`${l1}-${l2}-${l3}`,'本線'],
-    ['3連単②',`${l1}-${l3}-${l2}`,'ヒモ'],['2連複',`${Math.min(l1,l2)}=${Math.max(l1,l2)}`,'堅実'],
-    ['3連複',[l1,l2,l3].sort((a,b)=>a-b).join('='),'ワイド']
-  ].map(([tp,nm,od])=>`<div class="cc"><div class="ct2">${tp}</div><div class="cn">${nm}</div><div class="co">${od}</div></div>`).join('');
+
+  // ============ 展開分析 ============
+  const tac=analyzeTactics(boats,s,sn,wd,ws,wv);
+
+  // 展開パターン確率バー
+  const tacHtml=`
+  <div style="margin-bottom:14px">
+    <div style="display:flex;justify-content:space-between;margin-bottom:6px">
+      <span style="font-size:12px;font-weight:700;color:var(--wh)">🏁 展開パターン予測</span>
+    </div>
+    <div style="margin-bottom:8px">
+      <div style="display:flex;justify-content:space-between;font-size:11px;color:var(--mu);margin-bottom:3px">
+        <span>🔵 逃げ（1コース）</span><span style="color:var(--ac);font-weight:700">${tac.nigeProb}%</span>
+      </div>
+      <div style="height:8px;background:rgba(255,255,255,.1);border-radius:4px;overflow:hidden">
+        <div style="height:100%;width:${tac.nigeProb}%;background:var(--ac);border-radius:4px;transition:width .8s"></div>
+      </div>
+    </div>
+    <div style="margin-bottom:8px">
+      <div style="display:flex;justify-content:space-between;font-size:11px;color:var(--mu);margin-bottom:3px">
+        <span>🔴 まくり${tac.makuriMain?'（'+tac.makuriMain+'号艇候補）':''}</span><span style="color:var(--rd);font-weight:700">${tac.makuriProb}%</span>
+      </div>
+      <div style="height:8px;background:rgba(255,255,255,.1);border-radius:4px;overflow:hidden">
+        <div style="height:100%;width:${tac.makuriProb}%;background:var(--rd);border-radius:4px;transition:width .8s"></div>
+      </div>
+    </div>
+    <div style="margin-bottom:8px">
+      <div style="display:flex;justify-content:space-between;font-size:11px;color:var(--mu);margin-bottom:3px">
+        <span>🟡 差し${tac.sashiMain?'（'+tac.sashiMain+'号艇候補）':''}</span><span style="color:var(--go);font-weight:700">${tac.sashiProb}%</span>
+      </div>
+      <div style="height:8px;background:rgba(255,255,255,.1);border-radius:4px;overflow:hidden">
+        <div style="height:100%;width:${tac.sashiProb}%;background:var(--go);border-radius:4px;transition:width .8s"></div>
+      </div>
+    </div>
+    ${tac.otherProb>5?`<div style="margin-bottom:8px">
+      <div style="display:flex;justify-content:space-between;font-size:11px;color:var(--mu);margin-bottom:3px">
+        <span>⚪ その他（まくり差し等）</span><span style="font-weight:700">${tac.otherProb}%</span>
+      </div>
+      <div style="height:8px;background:rgba(255,255,255,.1);border-radius:4px;overflow:hidden">
+        <div style="height:100%;width:${tac.otherProb}%;background:var(--mu);border-radius:4px;transition:width .8s"></div>
+      </div>
+    </div>`:''}
+  </div>
+
+  ${tac.warnings.length>0?`
+  <div style="margin-bottom:14px">
+    <div style="font-size:12px;font-weight:700;color:var(--rd);margin-bottom:8px">⚠️ 警戒艇</div>
+    ${tac.warnings.map(w=>`
+      <div style="background:rgba(255,68,68,.08);border:1px solid rgba(255,68,68,.2);border-radius:8px;padding:8px 10px;margin-bottom:6px">
+        <div style="font-size:12px;font-weight:700;color:var(--wh);margin-bottom:3px">
+          <span class="bc-lane ${LC[w.boat.lane-1]}" style="width:18px;height:18px;font-size:10px;display:inline-flex;align-items:center;justify-content:center;border-radius:3px;margin-right:5px">${w.boat.lane}</span>
+          ${w.boat.name}
+        </div>
+        ${w.alerts.map(a=>`<div style="font-size:11px;color:var(--mu)">・${a}</div>`).join('')}
+      </div>`).join('')}
+  </div>`:''}`;
+
+  // 戦術別買い目3ルート
+  const routeA_1st=l1, routeA_2nd=l2, routeA_3rd=l3;
+  const routeB_1st=tac.makuriMain||l2, routeB_2nd=1, routeB_3rd=r.find(x=>x.lane!==routeB_1st&&x.lane!==1)?.lane||l3;
+  const routeC_1st=tac.sashiMain||l2, routeC_2nd=l1, routeC_3rd=r.find(x=>x.lane!==routeC_1st&&x.lane!==l1)?.lane||l3;
+
+  const routeHtml=`
+  <div style="margin-bottom:6px;font-size:12px;font-weight:700;color:var(--wh)">🎯 戦術別3ルート買い目</div>
+  <div style="display:grid;gap:8px">
+    <div style="background:rgba(0,200,255,.08);border:1px solid rgba(0,200,255,.25);border-radius:10px;padding:10px">
+      <div style="font-size:11px;color:var(--ac);font-weight:700;margin-bottom:5px">📘 ルートA：イン逃げ本線（確率${tac.nigeProb}%）</div>
+      <div style="font-size:14px;font-weight:800;color:var(--wh)">3連単 ${routeA_1st}-${routeA_2nd}-${routeA_3rd}</div>
+      <div style="font-size:11px;color:var(--mu);margin-top:3px">1号艇が逃げ切る王道パターン</div>
+    </div>
+    <div style="background:rgba(255,68,68,.08);border:1px solid rgba(255,68,68,.25);border-radius:10px;padding:10px">
+      <div style="font-size:11px;color:var(--rd);font-weight:700;margin-bottom:5px">📕 ルートB：まくり展開（確率${tac.makuriProb}%）</div>
+      <div style="font-size:14px;font-weight:800;color:var(--wh)">3連単 ${routeB_1st}-${routeB_2nd}-${routeB_3rd}</div>
+      <div style="font-size:11px;color:var(--mu);margin-top:3px">${tac.makuriMain||l2}号艇がまくって先頭、イン艇が内に残る</div>
+    </div>
+    <div style="background:rgba(240,180,41,.08);border:1px solid rgba(240,180,41,.25);border-radius:10px;padding:10px">
+      <div style="font-size:11px;color:var(--go);font-weight:700;margin-bottom:5px">📙 ルートC：差し展開（確率${tac.sashiProb}%）</div>
+      <div style="font-size:14px;font-weight:800;color:var(--wh)">3連単 ${routeC_1st}-${routeC_2nd}-${routeC_3rd}</div>
+      <div style="font-size:11px;color:var(--mu);margin-top:3px">${tac.sashiMain||l2}号艇がインの隙を差して1着</div>
+    </div>
+  </div>`;
+
+  document.getElementById('combos').innerHTML=routeHtml;
+
+  // 展開分析カードをランキングの前に差し込む
+  const tacCard=document.createElement('div');
+  tacCard.className='card';
+  tacCard.id='tac-card';
+  tacCard.innerHTML=`<div class="ch">🔍 展開分析</div><div class="cb">${tacHtml}</div>`;
+  const resultsDiv=document.getElementById('results');
+  const rankCard=document.getElementById('combos').closest('.card');
+  resultsDiv.insertBefore(tacCard,rankCard);
 
   // 分析レポート
   const top=r[0],sec=r[1];
@@ -891,6 +1227,7 @@ function render(sn,s,r,conf,wd,ws,wv,wx,gr){
 }
 
 initBoats();
+document.addEventListener('change',e=>{if(e.target.id&&e.target.id.startsWith('fc'))updateFormationPreview();});
 </script>
 
 </body></html>
