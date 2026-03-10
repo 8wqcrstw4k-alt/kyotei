@@ -237,13 +237,14 @@ select option{background:#0a1f35}
     <div class="ch">📊 分析スコアの構成</div>
     <div class="cb">
       <div class="weight-info">
-        <div class="wi2"><div class="wi2-dot" style="background:var(--ac)"></div><div><div class="wi2-txt">展示タイム</div><div class="wi2-val">25%</div></div></div>
-        <div class="wi2"><div class="wi2-dot" style="background:var(--go)"></div><div><div class="wi2-txt">モーター勝率</div><div class="wi2-val">20%</div></div></div>
-        <div class="wi2"><div class="wi2-dot" style="background:var(--gr)"></div><div><div class="wi2-txt">コース有利性</div><div class="wi2-val">18%</div></div></div>
-        <div class="wi2"><div class="wi2-dot" style="background:var(--pu)"></div><div><div class="wi2-txt">平均ST</div><div class="wi2-val">12%</div></div></div>
-        <div class="wi2"><div class="wi2-dot" style="background:#ff9060"></div><div><div class="wi2-txt">直近3走成績</div><div class="wi2-val">12%</div></div></div>
-        <div class="wi2"><div class="wi2-dot" style="background:#5ad4ff"></div><div><div class="wi2-txt">全国・当地勝率</div><div class="wi2-val">8%</div></div></div>
-        <div class="wi2"><div class="wi2-dot" style="background:var(--rd)"></div><div><div class="wi2-txt">気象・チルト他</div><div class="wi2-val">5%</div></div></div>
+        <div class="wi2"><div class="wi2-dot" style="background:var(--ac)"></div><div><div class="wi2-txt">展示タイム</div><div class="wi2-val">20%</div></div></div>
+        <div class="wi2"><div class="wi2-dot" style="background:var(--go)"></div><div><div class="wi2-txt">モーター(勝率+2連+3連)</div><div class="wi2-val">18%</div></div></div>
+        <div class="wi2"><div class="wi2-dot" style="background:var(--gr)"></div><div><div class="wi2-txt">コース有利性</div><div class="wi2-val">15%</div></div></div>
+        <div class="wi2"><div class="wi2-dot" style="background:#ff9060)"></div><div><div class="wi2-txt">当地(勝率+2連+3連)</div><div class="wi2-val">10%</div></div></div>
+        <div class="wi2"><div class="wi2-dot" style="background:#5ad4ff"></div><div><div class="wi2-txt">全国(勝率+2連+3連)</div><div class="wi2-val">10%</div></div></div>
+        <div class="wi2"><div class="wi2-dot" style="background:var(--pu)"></div><div><div class="wi2-txt">平均ST</div><div class="wi2-val">10%</div></div></div>
+        <div class="wi2"><div class="wi2-dot" style="background:#ff9060"></div><div><div class="wi2-txt">直近3走成績</div><div class="wi2-val">10%</div></div></div>
+        <div class="wi2"><div class="wi2-dot" style="background:var(--rd)"></div><div><div class="wi2-txt">気象・チルト他</div><div class="wi2-val">7%</div></div></div>
       </div>
     </div>
   </div>
@@ -326,13 +327,22 @@ function parsePaste(){
     const idx=i+1;
     if(b.name){setVal('n'+idx,b.name);count++;}
     if(b.rank)setSelect('k'+idx,b.rank);
+    if(b.odds)setVal('odds'+idx,b.odds);
     if(b.time)setVal('t'+idx,b.time.toFixed(2));
     if(b.st!==undefined)setVal('st'+idx,b.st.toFixed(2));
     if(b.tilt!==undefined)setSelect('tilt'+idx,b.tilt);
     if(b.motorRate)setVal('mr'+idx,b.motorRate.toFixed(1));
+    if(b.motor2)setVal('mr2'+idx,b.motor2.toFixed(1));
+    if(b.motor3)setVal('mr3'+idx,b.motor3.toFixed(1));
     if(b.boatRate)setVal('br'+idx,b.boatRate.toFixed(1));
+    if(b.boat2)setVal('br2'+idx,b.boat2.toFixed(1));
+    if(b.boat3)setVal('br3'+idx,b.boat3.toFixed(1));
     if(b.winRate)setVal('wr'+idx,b.winRate.toFixed(2));
+    if(b.win2)setVal('wr2'+idx,b.win2.toFixed(2));
+    if(b.win3)setVal('wr3'+idx,b.win3.toFixed(2));
     if(b.localRate)setVal('lr'+idx,b.localRate.toFixed(2));
+    if(b.local2)setVal('lr2'+idx,b.local2.toFixed(2));
+    if(b.local3)setVal('lr3'+idx,b.local3.toFixed(2));
     if(b.fl)setSelect('f'+idx,b.fl>0?b.fl:-1);
     if(b.recent&&b.recent.length>0){
       b.recent.slice(0,3).forEach((p,j)=>setVal(`r${j+1}_${idx}`,p));
@@ -367,7 +377,7 @@ function checkStructuredFormat(lines){
 // M2連率 → M3連率 → B2連率 → B3連率 →
 // 全国勝率 → 全国2連率 → 全国3連率 → 当地勝率 → 当地2連率 → 当地3連率
 function parseStructuredFormat(lines, boats){
-  const FIELD_ORDER=['name','rank','time','st','tilt','motorRate','motor3','boatRate','boat3','winRate','win2','win3','localRate','local2','local3'];
+  const FIELD_ORDER=['name','rank','odds','time','st','tilt','motorRate','motor3','boatRate','boat3','winRate','win2','win3','localRate','local2','local3'];
   let currentBoat=-1;
   let fieldIdx=0;
 
@@ -392,6 +402,10 @@ function parseStructuredFormat(lines, boats){
         break;
       case 'rank':
         if(/^(A1|A2|B1|B2)$/.test(l)){b.rank=l;fieldIdx++;}
+        break;
+      case 'odds':
+        if(/^\d{1,3}(\.\d)?$/.test(l)){b.odds=parseFloat(l);fieldIdx++;}
+        else if(l==='-'||l===''){fieldIdx++;} // オッズ未記載はスキップ
         break;
       case 'time':
         if(/^[67]\.\d{2}$/.test(l)){b.time=parseFloat(l);fieldIdx++;}
@@ -525,6 +539,14 @@ function initBoats(){
           </select></div>
         </div>
 
+        <div class="section-lbl">💴 単勝オッズ</div>
+        <div class="irow">
+          <div><label>単勝オッズ（倍）</label><input type="number" class="is" id="odds${i}" value="" step="0.1" min="1" max="999" placeholder="例: 3.5" oninput="updateSummary(${i})"></div>
+          <div style="display:flex;align-items:flex-end;padding-bottom:11px">
+            <div id="odds-tag${i}" style="font-size:11px;padding:4px 8px;border-radius:6px;background:rgba(90,138,176,.15);color:var(--mu)">未入力</div>
+          </div>
+        </div>
+
         <div class="section-lbl">⏱️ 展示タイム・スタート</div>
         <div class="irow">
           <div><label>展示タイム</label><input type="number" class="is" id="t${i}" value="${(6.70+(i-1)*.05).toFixed(2)}" step=".01" min="6" max="7.5" oninput="updateSummary(${i})"></div>
@@ -545,15 +567,27 @@ function initBoats(){
         </div>
 
         <div class="section-lbl">🔧 モーター・ボート</div>
-        <div class="irow">
-          <div><label>モーター勝率(%)</label><input type="number" class="is" id="mr${i}" value="35" step="0.1" min="0" max="100" oninput="updateSummary(${i})"></div>
-          <div><label>ボート勝率(%)</label><input type="number" class="is" id="br${i}" value="35" step="0.1" min="0" max="100"></div>
+        <div class="irow3" style="margin-bottom:6px">
+          <div><label>M勝率%</label><input type="number" class="is" id="mr${i}" value="35" step="0.1" min="0" max="100" oninput="updateSummary(${i})"></div>
+          <div><label>M2連率%</label><input type="number" class="is" id="mr2${i}" value="35" step="0.1" min="0" max="100"></div>
+          <div><label>M3連率%</label><input type="number" class="is" id="mr3${i}" value="50" step="0.1" min="0" max="100"></div>
+        </div>
+        <div class="irow3" style="margin-bottom:6px">
+          <div><label>B勝率%</label><input type="number" class="is" id="br${i}" value="35" step="0.1" min="0" max="100"></div>
+          <div><label>B2連率%</label><input type="number" class="is" id="br2${i}" value="35" step="0.1" min="0" max="100"></div>
+          <div><label>B3連率%</label><input type="number" class="is" id="br3${i}" value="50" step="0.1" min="0" max="100"></div>
         </div>
 
         <div class="section-lbl">📈 選手成績</div>
-        <div class="irow">
+        <div class="irow3" style="margin-bottom:6px">
           <div><label>全国勝率</label><input type="number" class="is" id="wr${i}" value="5.00" step=".01" min="0" max="9"></div>
+          <div><label>全国2連率</label><input type="number" class="is" id="wr2${i}" value="40" step=".01" min="0" max="100"></div>
+          <div><label>全国3連率</label><input type="number" class="is" id="wr3${i}" value="60" step=".01" min="0" max="100"></div>
+        </div>
+        <div class="irow3" style="margin-bottom:6px">
           <div><label>当地勝率</label><input type="number" class="is" id="lr${i}" value="5.00" step=".01" min="0" max="9"></div>
+          <div><label>当地2連率</label><input type="number" class="is" id="lr2${i}" value="40" step=".01" min="0" max="100"></div>
+          <div><label>当地3連率</label><input type="number" class="is" id="lr3${i}" value="60" step=".01" min="0" max="100"></div>
         </div>
         <div class="mg">
           <label>直近3走の着順（左が最新）</label>
@@ -585,8 +619,16 @@ function updateSummary(i){
   const t=document.getElementById('t'+i).value;
   const mr=document.getElementById('mr'+i).value;
   const kl=document.getElementById('k'+i).value;
+  const od=parseFloat(document.getElementById('odds'+i).value);
   document.getElementById('nm-disp'+i).textContent=nm;
-  document.getElementById('nm-sum'+i).textContent=`${kl} ｜ 展示${t}" ｜ モーター${mr}%`;
+  document.getElementById('nm-sum'+i).textContent=`${kl} ｜ 展示${t}" ｜ M${mr}%${od?` ｜ ${od}倍`:''}`;
+  // オッズタグ
+  const tag=document.getElementById('odds-tag'+i);
+  if(!od||isNaN(od)){tag.textContent='未入力';tag.style.background='rgba(90,138,176,.15)';tag.style.color='var(--mu)';}
+  else if(od<3){tag.textContent=`${od}倍 🔥大本命`;tag.style.background='rgba(255,68,68,.15)';tag.style.color='#ff6b6b';}
+  else if(od<6){tag.textContent=`${od}倍 ⭐人気`;tag.style.background='rgba(240,180,41,.15)';tag.style.color='var(--go)';}
+  else if(od<15){tag.textContent=`${od}倍 中穴`;tag.style.background='rgba(0,200,255,.1)';tag.style.color='var(--ac)';}
+  else{tag.textContent=`${od}倍 💎大穴`;tag.style.background='rgba(192,132,252,.15)';tag.style.color='var(--pu)';}
 }
 
 // ============ 予想実行 ============
@@ -626,9 +668,18 @@ function calc(sn){
       fl:getInt('f'+i,0),
       rank:document.getElementById('k'+i).value||'B1',
       motorRate:getNum('mr'+i,35),
+      motor2:getNum('mr2'+i,35),
+      motor3:getNum('mr3'+i,50),
       boatRate:getNum('br'+i,35),
+      boat2:getNum('br2'+i,35),
+      boat3:getNum('br3'+i,50),
       winRate:getNum('wr'+i,5.0),
+      win2:getNum('wr2'+i,40),
+      win3:getNum('wr3'+i,60),
       localRate:getNum('lr'+i,5.0),
+      local2:getNum('lr2'+i,40),
+      local3:getNum('lr3'+i,60),
+      odds:getNum('odds'+i,0),
       recent:[r1,r2,r3].filter(x=>x>0)
     });
   }
@@ -637,80 +688,105 @@ function calc(sn){
   const mn=Math.min(...times),mx=Math.max(...times),rng=mx-mn||.01;
   const motorRates=boats.map(b=>b.motorRate);
   const mnM=Math.min(...motorRates),mxM=Math.max(...motorRates),rngM=mxM-mnM||1;
-  const winRates=boats.map(b=>b.winRate);
-  const mxW=Math.max(...winRates),rngW=mxW-Math.min(...winRates)||1;
+
+  // 2連率・3連率の正規化用
+  const motor2s=boats.map(b=>b.motor2),mnM2=Math.min(...motor2s),mxM2=Math.max(...motor2s),rngM2=mxM2-mnM2||1;
+  const motor3s=boats.map(b=>b.motor3),mnM3=Math.min(...motor3s),mxM3=Math.max(...motor3s),rngM3=mxM3-mnM3||1;
+  const win2s=boats.map(b=>b.win2),mnW2=Math.min(...win2s),mxW2=Math.max(...win2s),rngW2=mxW2-mnW2||1;
+  const win3s=boats.map(b=>b.win3),mnW3=Math.min(...win3s),mxW3=Math.max(...win3s),rngW3=mxW3-mnW3||1;
+  const local2s=boats.map(b=>b.local2),mnL2=Math.min(...local2s),mxL2=Math.max(...local2s),rngL2=mxL2-mnL2||1;
+  const local3s=boats.map(b=>b.local3),mnL3=Math.min(...local3s),mxL3=Math.max(...local3s),rngL3=mxL3-mnL3||1;
 
   // コースアドバンテージ
   const cw=s.ia>.70?[30,14,8,5,4,3]:s.ia<.55?[18,16,14,12,10,8]:[25,15,10,8,6,4];
   const rkBonus={A1:8,A2:4,B1:1,B2:0};
 
   const scored=boats.map(b=>{
-    // ① 展示タイム (25点)
-    const tScore=((mx-b.time)/rng)*25;
+    // ① 展示タイム (20点)
+    const tScore=((mx-b.time)/rng)*20;
 
-    // ② モーター勝率 (20点)
-    const mScore=((b.motorRate-mnM)/rngM)*20;
+    // ② モーター総合 (18点) = 勝率6+2連率7+3連率5
+    const mScore1=((b.motorRate-mnM)/rngM)*6;
+    const mScore2=((b.motor2-mnM2)/rngM2)*7;
+    const mScore3=((b.motor3-mnM3)/rngM3)*5;
+    const mScore=mScore1+mScore2+mScore3;
 
-    // ③ コースアドバンテージ (18点)
-    let cScore=cw[b.lane-1]*(18/30);
+    // ③ コースアドバンテージ (15点)
+    let cScore=cw[b.lane-1]*(15/30);
 
-    // ④ 平均ST (12点) ST小さいほど良い
-    // 理想ST≒0.12〜0.18。0.10以下はフライング注意で逆補正
+    // ④ 平均ST (10点)
     const stBase=Math.max(0,0.35-b.st);
-    const stScore=(b.st<0.10||b.fl!==0)?0:Math.min(stBase/0.25,1)*12;
+    const stScore=(b.st<0.10||b.fl!==0)?0:Math.min(stBase/0.25,1)*10;
 
-    // ⑤ 直近3走 (12点)
-    let recentScore=6; // デフォルト中間
+    // ⑤ 直近3走 (10点)
+    let recentScore=5;
     if(b.recent.length>0){
       const avg=b.recent.reduce((a,v)=>a+v,0)/b.recent.length;
-      // 着順1=12点、6=0点
-      recentScore=Math.max(0,(6-avg)/5*12);
-      // 直近1走が1着なら+2ボーナス
-      if(b.recent[0]===1)recentScore=Math.min(12,recentScore+2);
+      recentScore=Math.max(0,(6-avg)/5*10);
+      if(b.recent[0]===1)recentScore=Math.min(10,recentScore+2);
     }
 
-    // ⑥ 全国・当地勝率 (8点)
-    const wScore=((b.winRate+b.localRate)/2/9)*8;
+    // ⑥ 全国成績総合 (10点) = 勝率3+2連率4+3連率3
+    const wScore=((b.winRate/9)*3) + ((b.win2-mnW2)/rngW2)*4 + ((b.win3-mnW3)/rngW3)*3;
 
-    // ⑦ チルト補正
-    // チルト+はスピード重視、直線有利だがターン不安定
+    // ⑦ 当地成績総合 (10点) = 勝率3+2連率4+3連率3
+    const lScore=((b.localRate/9)*3) + ((b.local2-mnL2)/rngL2)*4 + ((b.local3-mnL3)/rngL3)*3;
+
+    // ⑧ チルト補正
     let tiltBonus=0;
     if(b.tilt>0){
-      tiltBonus+=(b.tilt*0.5); // 直線系コースで有利
+      tiltBonus+=(b.tilt*0.5);
       if(['浜名湖','桐生','多摩川'].includes(sn))tiltBonus+=b.tilt*0.3;
     }
 
-    // ⑧ 級別ボーナス
+    // ⑨ 級別ボーナス
     const rankScore=rkBonus[b.rank]||0;
 
-    // ⑨ 風の影響
+    // ⑩ 風の影響
     let windBonus=0;
     if(wd==='向かい風'&&ws>5){if(b.lane<=2)windBonus+=ws*.25;else windBonus-=ws*.1;}
     if(wd==='追い風'&&ws>5){if(b.lane>=4)windBonus+=ws*.2;else windBonus-=ws*.08;}
     if((wd==='横風左'||wd==='横風右')&&ws>6&&(b.lane===3||b.lane===4))windBonus+=ws*.15;
 
-    // ⑩ 波
+    // ⑪ 波
     let waveBonus=0;
     if(wv>15){if(b.lane===1)waveBonus-=wv*.25;else if(b.lane>=4)waveBonus+=wv*.12;}
 
-    // ⑪ F/Lペナルティ
+    // ⑫ F/Lペナルティ
     let flPenalty=0;
     if(b.fl===1)flPenalty=-15;
     if(b.fl===2)flPenalty=-30;
     if(b.fl===-1)flPenalty=-10;
 
-    // ⑫ 場固有補正
+    // ⑬ 場固有補正
     let venueBonus=0;
     if((sn==='大村'||sn==='住之江')&&b.lane===1)venueBonus=8;
     if((sn==='江戸川'||sn==='津')&&b.lane===1)venueBonus=-6;
     if((sn==='江戸川'||sn==='津')&&b.lane>=4)venueBonus=5;
     if(gr==='SG'&&b.rank==='A1')venueBonus+=6;
 
-    const total=tScore+mScore+cScore+stScore+recentScore+wScore+tiltBonus+rankScore+windBonus+waveBonus+flPenalty+venueBonus;
+    // ⑭ オッズ補正（AIと市場の乖離を活用）
+    let oddsBonus=0;
+    if(b.odds>0){
+      // 全艇の平均オッズを基準に相対評価
+      const allOdds=boats.map(x=>x.odds).filter(x=>x>0);
+      if(allOdds.length>0){
+        const avgOdds=allOdds.reduce((a,v)=>a+v,0)/allOdds.length;
+        // AIスコアが高いのに高オッズ（市場が見逃している）→ 穴ボーナス
+        // AIスコアが低いのに低オッズ（過剰人気）→ 割引
+        const oddsRatio=b.odds/avgOdds;
+        if(oddsRatio>2.0) oddsBonus=+3;      // 大穴: AIが推すなら加点
+        else if(oddsRatio>1.3) oddsBonus=+1.5; // 中穴
+        else if(oddsRatio<0.5) oddsBonus=-2;   // 大本命の過剰人気割引
+        else if(oddsRatio<0.8) oddsBonus=-1;   // 本命の軽い割引
+      }
+    }
+
+    const total=tScore+mScore+cScore+stScore+recentScore+wScore+lScore+tiltBonus+rankScore+windBonus+waveBonus+flPenalty+venueBonus+oddsBonus;
 
     return{...b,
       sc:Math.max(0,total),
-      breakdown:{t:tScore,m:mScore,c:cScore,st:stScore,r:recentScore,w:wScore}
+      breakdown:{t:tScore,m:mScore,c:cScore,st:stScore,r:recentScore,w:wScore,l:lScore}
     };
   });
 
@@ -755,7 +831,7 @@ function render(sn,s,r,conf,wd,ws,wv,wx,gr){
       <div class="rbw">
         <div class="rn">
           <span>${b.name}<span style="font-size:10px;color:var(--mu)"> ${b.rank}</span></span>
-          <span class="rs2">${b.pct}%</span>
+          <span class="rs2">${b.pct}%${b.odds>0?` <span style="font-size:11px;color:${b.odds<3?'#ff6b6b':b.odds<6?'var(--go)':b.odds<15?'var(--ac)':'var(--pu)'}">　${b.odds}倍</span>`:''}</span>
         </div>
         <div class="rb"><div class="rbf ${i===0?'top':''}" style="width:${b.pct}%"></div></div>
         <div class="score-detail">
